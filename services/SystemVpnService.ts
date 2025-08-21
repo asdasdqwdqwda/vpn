@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VpnConfig, ConnectionStatus } from '@/types/vpn';
+import { AndroidVpnService } from './AndroidVpnService';
 
 // System VPN integration for mobile devices
 export class SystemVpnService {
@@ -9,6 +10,7 @@ export class SystemVpnService {
   private currentConfig: VpnConfig | null = null;
   private statusCallbacks: ((status: ConnectionStatus) => void)[] = [];
   private configCallbacks: ((config: VpnConfig | null) => void)[] = [];
+  private androidVpnService: AndroidVpnService;
 
   // VPN Authentication credentials
   private readonly VPN_USERNAME = 'vpnbook';
@@ -19,6 +21,10 @@ export class SystemVpnService {
       SystemVpnService.instance = new SystemVpnService();
     }
     return SystemVpnService.instance;
+  }
+
+  constructor() {
+    this.androidVpnService = AndroidVpnService.getInstance();
   }
 
   // Request VPN permissions for system-level integration
@@ -35,9 +41,8 @@ export class SystemVpnService {
         console.log('iOS: VPN permissions would be requested via native module');
         return true; // Simulate permission granted for development
       } else if (Platform.OS === 'android') {
-        // Android VPN permission request (would require native module)
-        console.log('Android: VPN permissions would be requested via native module');
-        return true; // Simulate permission granted for development
+        // Android VPN permission request
+        return await this.androidVpnService.requestVpnPermissions();
       }
 
       return false;
@@ -78,8 +83,11 @@ export class SystemVpnService {
         // iOS VPN configuration (would require native module)
         console.log('iOS: Configuring VPN with native module', vpnConfig);
       } else if (Platform.OS === 'android') {
-        // Android VPN configuration (would require native module)
-        console.log('Android: Configuring VPN with native module', vpnConfig);
+        // Android VPN configuration
+        const success = await this.androidVpnService.configureVpnService(config);
+        if (!success) {
+          return false;
+        }
       }
 
       // Store configuration
@@ -108,8 +116,13 @@ export class SystemVpnService {
         // iOS VPN connection (would require native module)
         console.log('iOS: Starting VPN connection via native module');
       } else if (Platform.OS === 'android') {
-        // Android VPN connection (would require native module)
-        console.log('Android: Starting VPN connection via native module');
+        // Android VPN connection
+        const success = await this.androidVpnService.startVpnService();
+        if (!success) {
+          this.connectionStatus = 'disconnected';
+          this.notifyStatusChange();
+          return false;
+        }
       }
 
       this.connectionStatus = 'connected';
@@ -143,8 +156,11 @@ export class SystemVpnService {
         // iOS VPN disconnection (would require native module)
         console.log('iOS: Stopping VPN connection via native module');
       } else if (Platform.OS === 'android') {
-        // Android VPN disconnection (would require native module)
-        console.log('Android: Stopping VPN connection via native module');
+        // Android VPN disconnection
+        const success = await this.androidVpnService.stopVpnService();
+        if (!success) {
+          return false;
+        }
       }
 
       this.connectionStatus = 'disconnected';

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   StatusBar,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
@@ -13,8 +14,10 @@ import {
   Upload, 
   Timer, 
   Shield, 
-  Wifi 
+  Wifi,
+  Smartphone
 } from 'lucide-react-native';
+import { AndroidVpnService } from '@/services/AndroidVpnService';
 
 export default function StatsScreen() {
   const [stats, setStats] = useState({
@@ -27,7 +30,10 @@ export default function StatsScreen() {
     connections: 42,
     blockedThreats: 127,
   });
+  const [protectedApps, setProtectedApps] = useState<string[]>([]);
+  const [androidStats, setAndroidStats] = useState<any>(null);
 
+  const androidVpnService = AndroidVpnService.getInstance();
   useEffect(() => {
     // Simulate real-time data updates
     const interval = setInterval(() => {
@@ -39,9 +45,25 @@ export default function StatsScreen() {
       }));
     }, 2000);
 
+    // Load Android-specific data
+    if (Platform.OS === 'android') {
+      loadAndroidData();
+    }
+
     return () => clearInterval(interval);
   }, []);
 
+  const loadAndroidData = async () => {
+    try {
+      const apps = await androidVpnService.getAppsUsingVpn();
+      const vpnStats = await androidVpnService.getVpnStatistics();
+      
+      setProtectedApps(apps);
+      setAndroidStats(vpnStats);
+    } catch (error) {
+      console.error('Failed to load Android VPN data:', error);
+    }
+  };
   const formatData = (bytes: number) => {
     if (bytes < 1024) return `${bytes.toFixed(1)} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -49,13 +71,28 @@ export default function StatsScreen() {
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
   };
 
+  const getAppName = (packageName: string) => {
+    const appNames: { [key: string]: string } = {
+      'com.google.android.youtube': 'YouTube',
+      'com.whatsapp': 'WhatsApp',
+      'com.android.chrome': 'Chrome',
+      'com.instagram.android': 'Instagram',
+      'com.facebook.katana': 'Facebook',
+      'com.twitter.android': 'Twitter',
+      'com.spotify.music': 'Spotify',
+      'com.netflix.mediaclient': 'Netflix',
+    };
+    return appNames[packageName] || packageName;
+  };
   return (
     <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
       
       <View style={styles.header}>
         <Text style={styles.title}>Statistics</Text>
-        <Text style={styles.subtitle}>System VPN Usage Overview</Text>
+        <Text style={styles.subtitle}>
+          {Platform.OS === 'android' ? 'Android System VPN Stats' : 'System VPN Usage Overview'}
+        </Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -150,13 +187,36 @@ export default function StatsScreen() {
           </View>
         </View>
 
+        {/* Android Protected Apps */}
+        {Platform.OS === 'android' && protectedApps.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Protected Android Apps</Text>
+            <View style={styles.appsGrid}>
+              {protectedApps.slice(0, 8).map((app, index) => (
+                <View key={index} style={styles.appCard}>
+                  <Smartphone size={16} color="#4ade80" />
+                  <Text style={styles.appName}>{getAppName(app)}</Text>
+                  <View style={styles.protectedIndicator} />
+                </View>
+              ))}
+            </View>
+            <Text style={styles.appsNote}>
+              All {protectedApps.length} installed apps are protected via system VPN
+            </Text>
+          </View>
+        )}
+
         {/* Performance Metrics */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>System VPN Performance</Text>
+          <Text style={styles.sectionTitle}>
+            {Platform.OS === 'android' ? 'Android VPN Performance' : 'System VPN Performance'}
+          </Text>
           <View style={styles.performanceGrid}>
             <View style={styles.performanceItem}>
               <Text style={styles.performanceValue}>18ms</Text>
-              <Text style={styles.performanceLabel}>System Latency</Text>
+              <Text style={styles.performanceLabel}>
+                {Platform.OS === 'android' ? 'Android Latency' : 'System Latency'}
+              </Text>
               <View style={[styles.performanceIndicator, { backgroundColor: '#22c55e' }]} />
             </View>
             <View style={styles.performanceItem}>
@@ -359,5 +419,39 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
+  },
+  appsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  appCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    padding: 8,
+    minWidth: '45%',
+    borderWidth: 1,
+    borderColor: 'rgba(74, 222, 128, 0.3)',
+  },
+  appName: {
+    fontSize: 12,
+    color: 'white',
+    marginLeft: 6,
+    flex: 1,
+  },
+  protectedIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#4ade80',
+  },
+  appsNote: {
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginTop: 12,
+    fontStyle: 'italic',
   },
 });

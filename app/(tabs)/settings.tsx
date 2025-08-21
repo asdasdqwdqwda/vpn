@@ -8,6 +8,7 @@ import {
   Switch,
   StatusBar,
   Alert,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
@@ -21,19 +22,45 @@ import {
   MessageCircle,
   Star,
   ChevronRight,
-  Wifi
+  Wifi,
+  Android
 } from 'lucide-react-native';
+import { AndroidVpnService } from '@/services/AndroidVpnService';
 
 export default function SettingsScreen() {
   const [autoConnect, setAutoConnect] = useState(true);
   const [killSwitch, setKillSwitch] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [dataCompression, setDataCompression] = useState(false);
+  const [androidOptimization, setAndroidOptimization] = useState(true);
 
+  const androidVpnService = AndroidVpnService.getInstance();
   const showAlert = (title: string, message: string) => {
     Alert.alert(title, message, [{ text: 'OK' }]);
   };
 
+  const handleAndroidVpnTest = async () => {
+    if (Platform.OS !== 'android') {
+      showAlert('Android Only', 'This feature is only available on Android devices.');
+      return;
+    }
+
+    try {
+      const hasPermissions = await androidVpnService.hasVpnPermissions();
+      if (hasPermissions) {
+        showAlert('Android VPN Ready', 'Android VPN permissions are granted and ready for system-level protection.');
+      } else {
+        const granted = await androidVpnService.requestVpnPermissions();
+        if (granted) {
+          showAlert('Permissions Granted', 'Android VPN is now ready to protect all device traffic.');
+        } else {
+          showAlert('Permissions Required', 'VPN permissions are needed to protect all Android app traffic.');
+        }
+      }
+    } catch (error) {
+      showAlert('Error', 'Failed to check Android VPN permissions.');
+    }
+  };
   const SettingItem = ({ 
     icon, 
     title, 
@@ -88,12 +115,17 @@ export default function SettingsScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Connection Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>System VPN Settings</Text>
+          <Text style={styles.sectionTitle}>
+            {Platform.OS === 'android' ? 'Android VPN Settings' : 'System VPN Settings'}
+          </Text>
           <View style={styles.sectionContent}>
             <SettingItem
               icon={<Wifi size={20} color="#4ade80" />}
-              title="Auto System VPN"
-              subtitle="Enable VPN automatically on untrusted networks"
+              title={Platform.OS === 'android' ? 'Auto Android VPN' : 'Auto System VPN'}
+              subtitle={Platform.OS === 'android' 
+                ? 'Enable VPN automatically for all Android apps' 
+                : 'Enable VPN automatically on untrusted networks'
+              }
               hasSwitch
               switchValue={autoConnect}
               onSwitchChange={setAutoConnect}
@@ -101,7 +133,10 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Shield size={20} color="#ef4444" />}
               title="Kill Switch"
-              subtitle="Block all traffic if system VPN disconnects"
+              subtitle={Platform.OS === 'android' 
+                ? 'Block all Android app traffic if VPN disconnects' 
+                : 'Block all traffic if system VPN disconnects'
+              }
               hasSwitch
               switchValue={killSwitch}
               onSwitchChange={setKillSwitch}
@@ -109,9 +144,20 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Globe size={20} color="#3b82f6" />}
               title="Protocol Settings"
-              subtitle="System VPN protocol preferences"
+              subtitle={Platform.OS === 'android' 
+                ? 'Android VPN protocol preferences' 
+                : 'System VPN protocol preferences'
+              }
               onPress={() => showAlert('Protocol Settings', 'Advanced protocol configuration coming soon')}
             />
+            {Platform.OS === 'android' && (
+              <SettingItem
+                icon={<Android size={20} color="#4ade80" />}
+                title="Android VPN Test"
+                subtitle="Test Android VPN permissions and functionality"
+                onPress={handleAndroidVpnTest}
+              />
+            )}
           </View>
         </View>
 
@@ -122,16 +168,22 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Lock size={20} color="#f59e0b" />}
               title="DNS Protection"
-              subtitle="System-wide DNS filtering and ad blocking"
+              subtitle={Platform.OS === 'android' 
+                ? 'Android system-wide DNS filtering and ad blocking' 
+                : 'System-wide DNS filtering and ad blocking'
+              }
               onPress={() => showAlert('DNS Protection', 'Enhanced DNS protection is enabled')}
             />
             <SettingItem
               icon={<Smartphone size={20} color="#8b5cf6" />}
-              title="App Traffic Monitoring"
-              subtitle="Monitor which apps use VPN tunnel"
+              title={Platform.OS === 'android' ? 'Android App Monitoring' : 'App Traffic Monitoring'}
+              subtitle={Platform.OS === 'android' 
+                ? 'Monitor which Android apps use VPN tunnel' 
+                : 'Monitor which apps use VPN tunnel'
+              }
               hasSwitch
-              switchValue={dataCompression}
-              onSwitchChange={setDataCompression}
+              switchValue={Platform.OS === 'android' ? androidOptimization : dataCompression}
+              onSwitchChange={Platform.OS === 'android' ? setAndroidOptimization : setDataCompression}
             />
           </View>
         </View>
@@ -180,9 +232,14 @@ export default function SettingsScreen() {
         <View style={styles.appInfo}>
           <Text style={styles.appInfoTitle}>SecureVPN</Text>
           <Text style={styles.appInfoVersion}>Version 1.0.0</Text>
-          <Text style={styles.appInfoSystem}>System VPN Integration</Text>
+          <Text style={styles.appInfoSystem}>
+            {Platform.OS === 'android' ? 'Android System VPN' : 'System VPN Integration'}
+          </Text>
           <Text style={styles.appInfoAuth}>vpnbook / m34wk9w</Text>
           <Text style={styles.appInfoCopyright}>© 2024 SecureVPN Canada</Text>
+          {Platform.OS === 'android' && (
+            <Text style={styles.appInfoAndroid}>🤖 Android VPN Service Ready</Text>
+          )}
         </View>
       </ScrollView>
     </LinearGradient>
@@ -296,5 +353,11 @@ const styles = StyleSheet.create({
   appInfoCopyright: {
     fontSize: 12,
     color: '#64748b',
+  },
+  appInfoAndroid: {
+    fontSize: 12,
+    color: '#4ade80',
+    fontWeight: '500',
+    marginTop: 4,
   },
 });
