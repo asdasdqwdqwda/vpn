@@ -8,6 +8,10 @@ export class VpnService {
   private statusCallbacks: ((status: ConnectionStatus) => void)[] = [];
   private configCallbacks: ((config: VpnConfig | null) => void)[] = [];
 
+  // VPN Authentication credentials
+  private readonly VPN_USERNAME = 'vpnbook';
+  private readonly VPN_PASSWORD = 'm34wk9w';
+
   static getInstance(): VpnService {
     if (!VpnService.instance) {
       VpnService.instance = new VpnService();
@@ -460,6 +464,8 @@ nobind
 persist-key
 persist-tun
 auth-user-pass
+# Username: ${this.VPN_USERNAME}
+# Password: ${this.VPN_PASSWORD}
 comp-lzo
 verb 3
 cipher AES-256-CBC

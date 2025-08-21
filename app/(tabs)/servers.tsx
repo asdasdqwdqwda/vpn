@@ -221,6 +221,9 @@ export default function ServersScreen() {
         <Text style={styles.footerText}>
           💡 UDP protocols are tried first for optimal speed
         </Text>
+        <Text style={styles.footerAuth}>
+          🔐 All servers use: vpnbook / m34wk9w
+        </Text>
       </View>
     </LinearGradient>
   );
@@ -416,5 +419,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748b',
     textAlign: 'center',
+    marginBottom: 4,
+  },
+  footerAuth: {
+    fontSize: 11,
+    color: '#22c55e',
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });

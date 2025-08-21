@@ -214,6 +214,11 @@ export default function ConnectScreen() {
       {/* Fallback Chain Info */}
       <View style={styles.fallbackChain}>
         <Text style={styles.fallbackChainTitle}>Smart Connection Order:</Text>
+        <View style={styles.authInfo}>
+          <Text style={styles.authText}>
+            🔐 Authentication: vpnbook / m34wk9w
+          </Text>
+        </View>
         <View style={styles.fallbackItems}>
           <View style={styles.fallbackItem}>
             <Text style={styles.fallbackNumber}>1</Text>
@@ -413,6 +418,20 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  authInfo: {
+    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(34, 197, 94, 0.3)',
+  },
+  authText: {
+    fontSize: 12,
+    color: '#22c55e',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   fallbackItems: {
     flexDirection: 'row',

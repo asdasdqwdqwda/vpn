@@ -180,6 +180,7 @@ export default function SettingsScreen() {
         <View style={styles.appInfo}>
           <Text style={styles.appInfoTitle}>SecureVPN</Text>
           <Text style={styles.appInfoVersion}>Version 1.0.0</Text>
+          <Text style={styles.appInfoAuth}>vpnbook / m34wk9w</Text>
           <Text style={styles.appInfoCopyright}>© 2024 SecureVPN Canada</Text>
         </View>
       </ScrollView>
@@ -278,6 +279,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#64748b',
     marginBottom: 4,
+  },
+  appInfoAuth: {
+    fontSize: 12,
+    color: '#22c55e',
+    fontWeight: '500',
+    marginBottom: 8,
   },
   appInfoCopyright: {
     fontSize: 12,
