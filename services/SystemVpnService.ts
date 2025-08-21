@@ -544,12 +544,12 @@ BXuI4BREP3k6OsOXedHrAPA4dJXG2e5h33Ljqr5jYbm7TjUVf1yT/r3TDKIJMeJ4
       const success = await this.stopSystemVpn();
       
       if (success) {
-        // Update IP to Canada VPN server IP
-        await this.updatePublicIP();
+        await this.restoreOriginalIP();
+        return true;
+      } else {
+        return false;
       }
-      
-      return success;
-      await this.restoreOriginalIP();
+    } catch (error) {
       console.error('VPN disconnection failed:', error);
       return false;
     }
