@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Shield, Power, MapPin, Timer, Wifi, Zap } from 'lucide-react-native';
-import { VpnService } from '@/services/VpnService';
+import { SystemVpnService } from '@/services/SystemVpnService';
 import { ConnectionStatus, VpnConfig } from '@/types/vpn';
+import { ConnectionStatusBar } from '@/components/ConnectionStatusBar';
 
 const { width } = Dimensions.get('window');
 
@@ -21,12 +22,12 @@ export default function ConnectScreen() {
   const [ipAddress, setIpAddress] = useState('Not connected');
   const [fallbackAttempt, setFallbackAttempt] = useState(0);
 
-  const vpnService = VpnService.getInstance();
+  const systemVpnService = SystemVpnService.getInstance();
 
   useEffect(() => {
     // Subscribe to status changes
-    vpnService.onStatusChange(setConnectionStatus);
-    vpnService.onConfigChange(setCurrentConfig);
+    systemVpnService.onStatusChange(setConnectionStatus);
+    systemVpnService.onConfigChange(setCurrentConfig);
 
     return () => {
       // Cleanup subscriptions would go here in a real implementation
@@ -57,12 +58,12 @@ export default function ConnectScreen() {
   const handleConnect = async () => {
     if (connectionStatus === 'disconnected') {
       setFallbackAttempt(0);
-      const success = await vpnService.connectWithFallback();
+      const success = await systemVpnService.connectWithAutoFallback();
       if (success) {
         setIpAddress('144.217.253.149');
       }
     } else if (connectionStatus === 'connected') {
-      await vpnService.disconnect();
+      await systemVpnService.disconnect();
       setIpAddress('Not connected');
     }
   };
@@ -103,22 +104,12 @@ export default function ConnectScreen() {
     <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
       
-      {/* Status Bar with VPN Config */}
-      {currentConfig && connectionStatus === 'connected' && (
-        <View style={styles.statusBar}>
-          <View style={styles.statusBarContent}>
-            <Wifi size={16} color="#4ade80" />
-            <Text style={styles.statusBarText}>
-              Connected via {currentConfig.proto.toUpperCase()}:{currentConfig.port}
-            </Text>
-            <View style={styles.statusIndicator} />
-          </View>
-        </View>
-      )}
+      {/* System VPN Status Bar */}
+      <ConnectionStatusBar config={currentConfig} status={connectionStatus} />
       
       <View style={styles.header}>
         <Text style={styles.title}>SecureVPN</Text>
-        <Text style={styles.subtitle}>Canada Servers</Text>
+        <Text style={styles.subtitle}>System VPN • All Traffic Protected</Text>
       </View>
 
       <View style={styles.statusContainer}>
@@ -138,10 +129,10 @@ export default function ConnectScreen() {
         <Text style={styles.statusText}>{getStatusText()}</Text>
         <Text style={styles.statusSubtext}>
           {connectionStatus === 'connected' 
-            ? 'Your connection is secure' 
+            ? 'All device traffic is protected via Canada VPN' 
             : connectionStatus === 'connecting'
-            ? 'Smart fallback enabled'
-            : 'Tap to connect with auto-fallback'
+            ? 'Configuring system VPN with smart fallback'
+            : 'Tap to enable system-wide VPN protection'
           }
         </Text>
       </View>
@@ -151,7 +142,7 @@ export default function ConnectScreen() {
         <View style={styles.fallbackInfo}>
           <Zap size={20} color="#f59e0b" />
           <Text style={styles.fallbackText}>
-            Trying UDP first, will fallback to TCP if needed
+            System VPN: UDP first → TCP fallback (All apps protected)
           </Text>
         </View>
       )}
@@ -205,15 +196,15 @@ export default function ConnectScreen() {
       <View style={styles.protectionBanner}>
         <Text style={styles.bannerText}>
           {connectionStatus === 'connected' 
-            ? '🔒 Your traffic is encrypted and secure'
-            : '⚠️ Your traffic is not protected'
+            ? '🔒 System VPN Active: YouTube, WhatsApp, Browser - All Protected'
+            : '⚠️ System VPN Inactive: Device traffic not protected'
           }
         </Text>
       </View>
 
       {/* Fallback Chain Info */}
       <View style={styles.fallbackChain}>
-        <Text style={styles.fallbackChainTitle}>Smart Connection Order:</Text>
+        <Text style={styles.fallbackChainTitle}>System VPN Auto-Fallback Order:</Text>
         <View style={styles.authInfo}>
           <Text style={styles.authText}>
             🔐 Authentication: vpnbook / m34wk9w
@@ -258,32 +249,7 @@ export default function ConnectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
-  },
-  statusBar: {
-    backgroundColor: 'rgba(74, 222, 128, 0.2)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(74, 222, 128, 0.3)',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-  },
-  statusBarContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusBarText: {
-    color: '#4ade80',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 8,
-    marginRight: 8,
-  },
-  statusIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#4ade80',
+    paddingTop: 50,
   },
   header: {
     alignItems: 'center',

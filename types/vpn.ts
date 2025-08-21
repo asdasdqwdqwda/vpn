@@ -36,4 +36,3 @@ export interface ConnectionStats {
     download: number;
     upload: number;
   };
-}

@@ -55,7 +55,7 @@ export default function StatsScreen() {
       
       <View style={styles.header}>
         <Text style={styles.title}>Statistics</Text>
-        <Text style={styles.subtitle}>Your VPN usage overview</Text>
+        <Text style={styles.subtitle}>System VPN Usage Overview</Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -97,17 +97,17 @@ export default function StatsScreen() {
 
         {/* Security Stats */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Security</Text>
+          <Text style={styles.sectionTitle}>System Protection</Text>
           <View style={styles.statsGrid}>
             <View style={styles.statCard}>
               <Shield size={20} color="#10b981" />
               <Text style={styles.statValue}>{stats.blockedThreats}</Text>
-              <Text style={styles.statLabel}>Threats Blocked</Text>
+              <Text style={styles.statLabel}>System Threats Blocked</Text>
             </View>
             <View style={styles.statCard}>
               <Wifi size={20} color="#06b6d4" />
               <Text style={styles.statValue}>{stats.connections}</Text>
-              <Text style={styles.statLabel}>Secure Connections</Text>
+              <Text style={styles.statLabel}>Protected App Connections</Text>
             </View>
           </View>
         </View>
@@ -152,11 +152,11 @@ export default function StatsScreen() {
 
         {/* Performance Metrics */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Performance</Text>
+          <Text style={styles.sectionTitle}>System VPN Performance</Text>
           <View style={styles.performanceGrid}>
             <View style={styles.performanceItem}>
               <Text style={styles.performanceValue}>18ms</Text>
-              <Text style={styles.performanceLabel}>Latency</Text>
+              <Text style={styles.performanceLabel}>System Latency</Text>
               <View style={[styles.performanceIndicator, { backgroundColor: '#22c55e' }]} />
             </View>
             <View style={styles.performanceItem}>

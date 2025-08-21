@@ -82,18 +82,18 @@ export default function SettingsScreen() {
       
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>Configure your VPN experience</Text>
+        <Text style={styles.subtitle}>System VPN Configuration</Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Connection Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Connection</Text>
+          <Text style={styles.sectionTitle}>System VPN Settings</Text>
           <View style={styles.sectionContent}>
             <SettingItem
               icon={<Wifi size={20} color="#4ade80" />}
-              title="Auto Connect"
-              subtitle="Connect automatically on untrusted networks"
+              title="Auto System VPN"
+              subtitle="Enable VPN automatically on untrusted networks"
               hasSwitch
               switchValue={autoConnect}
               onSwitchChange={setAutoConnect}
@@ -101,7 +101,7 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Shield size={20} color="#ef4444" />}
               title="Kill Switch"
-              subtitle="Block internet if VPN disconnects"
+              subtitle="Block all traffic if system VPN disconnects"
               hasSwitch
               switchValue={killSwitch}
               onSwitchChange={setKillSwitch}
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Globe size={20} color="#3b82f6" />}
               title="Protocol Settings"
-              subtitle="OpenVPN, TCP/UDP configuration"
+              subtitle="System VPN protocol preferences"
               onPress={() => showAlert('Protocol Settings', 'Advanced protocol configuration coming soon')}
             />
           </View>
@@ -122,13 +122,13 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Lock size={20} color="#f59e0b" />}
               title="DNS Protection"
-              subtitle="Block malicious domains and ads"
+              subtitle="System-wide DNS filtering and ad blocking"
               onPress={() => showAlert('DNS Protection', 'Enhanced DNS protection is enabled')}
             />
             <SettingItem
               icon={<Smartphone size={20} color="#8b5cf6" />}
-              title="Data Compression"
-              subtitle="Reduce data usage by up to 50%"
+              title="App Traffic Monitoring"
+              subtitle="Monitor which apps use VPN tunnel"
               hasSwitch
               switchValue={dataCompression}
               onSwitchChange={setDataCompression}
@@ -180,6 +180,7 @@ export default function SettingsScreen() {
         <View style={styles.appInfo}>
           <Text style={styles.appInfoTitle}>SecureVPN</Text>
           <Text style={styles.appInfoVersion}>Version 1.0.0</Text>
+          <Text style={styles.appInfoSystem}>System VPN Integration</Text>
           <Text style={styles.appInfoAuth}>vpnbook / m34wk9w</Text>
           <Text style={styles.appInfoCopyright}>© 2024 SecureVPN Canada</Text>
         </View>
@@ -278,7 +279,13 @@ const styles = StyleSheet.create({
   appInfoVersion: {
     fontSize: 14,
     color: '#64748b',
-    marginBottom: 4,
+    marginBottom: 2,
+  },
+  appInfoSystem: {
+    fontSize: 12,
+    color: '#4ade80',
+    fontWeight: '600',
+    marginBottom: 6,
   },
   appInfoAuth: {
     fontSize: 12,

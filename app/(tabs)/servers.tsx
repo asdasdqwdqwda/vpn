@@ -10,16 +10,16 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Server, Wifi, Shield, Check, Zap, Clock } from 'lucide-react-native';
 import { VpnServer, VpnConfig } from '@/types/vpn';
-import { VpnService } from '@/services/VpnService';
+import { SystemVpnService } from '@/services/SystemVpnService';
 
 export default function ServersScreen() {
   const [selectedServer, setSelectedServer] = useState('canada-udp-53');
   const [currentConfig, setCurrentConfig] = useState<VpnConfig | null>(null);
 
-  const vpnService = VpnService.getInstance();
+  const systemVpnService = SystemVpnService.getInstance();
 
   useEffect(() => {
-    vpnService.onConfigChange(setCurrentConfig);
+    systemVpnService.onConfigChange(setCurrentConfig);
   }, []);
 
   const servers: VpnServer[] = [
@@ -113,14 +113,14 @@ export default function ServersScreen() {
       
       <View style={styles.header}>
         <Text style={styles.title}>VPN Servers</Text>
-        <Text style={styles.subtitle}>Smart auto-fallback enabled</Text>
+        <Text style={styles.subtitle}>System VPN • Smart Auto-Fallback</Text>
       </View>
 
-      {/* Auto-Fallback Banner */}
+      {/* System VPN Auto-Fallback Banner */}
       <View style={styles.fallbackBanner}>
         <Zap size={20} color="#f59e0b" />
         <Text style={styles.fallbackBannerText}>
-          Auto-fallback: UDP first → TCP if needed
+          System VPN: UDP first → TCP fallback • All device traffic protected
         </Text>
       </View>
 
@@ -219,7 +219,7 @@ export default function ServersScreen() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          💡 UDP protocols are tried first for optimal speed
+          💡 System VPN routes ALL device traffic (YouTube, WhatsApp, etc.)
         </Text>
         <Text style={styles.footerAuth}>
           🔐 All servers use: vpnbook / m34wk9w
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   fallbackBannerText: {
     color: '#f59e0b',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     marginLeft: 8,
   },
   scrollView: {
