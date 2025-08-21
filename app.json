@@ -28,7 +28,6 @@
           },
           "android": {
             "usesCleartextTraffic": false,
-            "networkSecurityConfig": "@xml/network_security_config",
             "permissions": [
               "android.permission.BIND_VPN_SERVICE",
               "android.permission.INTERNET",
