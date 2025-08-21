@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Shield, Power, MapPin, Timer, Wifi, Zap } from 'lucide-react-native';
 import { SystemVpnService } from '@/services/SystemVpnService';
 import { ConnectionStatus, VpnConfig } from '@/types/vpn';
-import { ConnectionStatusBar } from '@/components/ConnectionStatusBar';
+import ConnectionStatusBar from '@/components/ConnectionStatusBar';
 
 const { width } = Dimensions.get('window');
 
