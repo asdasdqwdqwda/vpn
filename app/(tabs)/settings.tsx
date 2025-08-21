@@ -11,20 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { 
-  Settings as SettingsIcon, 
-  Shield, 
-  Bell, 
-  Lock, 
-  Smartphone,
-  Globe,
-  Info,
-  MessageCircle,
-  Star,
-  ChevronRight,
-  Wifi,
-  Android
-} from 'lucide-react-native';
+import { Settings as SettingsIcon, Shield, Bell, Lock, Smartphone, Globe, Info, MessageCircle, Star, ChevronRight, Wifi, Cuboid as Android } from 'lucide-react-native';
 import { AndroidVpnService } from '@/services/AndroidVpnService';
 
 export default function SettingsScreen() {
@@ -232,14 +219,9 @@ export default function SettingsScreen() {
         <View style={styles.appInfo}>
           <Text style={styles.appInfoTitle}>SecureVPN</Text>
           <Text style={styles.appInfoVersion}>Version 1.0.0</Text>
-          <Text style={styles.appInfoSystem}>
-            {Platform.OS === 'android' ? 'Android System VPN' : 'System VPN Integration'}
-          </Text>
+          <Text style={styles.appInfoSystem}>System VPN Integration</Text>
           <Text style={styles.appInfoAuth}>vpnbook / m34wk9w</Text>
           <Text style={styles.appInfoCopyright}>© 2024 SecureVPN Canada</Text>
-          {Platform.OS === 'android' && (
-            <Text style={styles.appInfoAndroid}>🤖 Android VPN Service Ready</Text>
-          )}
         </View>
       </ScrollView>
     </LinearGradient>
@@ -353,11 +335,5 @@ const styles = StyleSheet.create({
   appInfoCopyright: {
     fontSize: 12,
     color: '#64748b',
-  },
-  appInfoAndroid: {
-    fontSize: 12,
-    color: '#4ade80',
-    fontWeight: '500',
-    marginTop: 4,
   },
 });
