@@ -141,7 +141,7 @@ export default function SettingsScreen() {
               <SettingItem
                 icon={<Android size={20} color="#4ade80" />}
                 title="Android VPN Test"
-                subtitle="Test Android VPN permissions and functionality"
+                subtitle="Test Android system VPN and IP masking"
                 onPress={handleAndroidVpnTest}
               />
             )}
@@ -155,10 +155,7 @@ export default function SettingsScreen() {
             <SettingItem
               icon={<Lock size={20} color="#f59e0b" />}
               title="DNS Protection"
-              subtitle={Platform.OS === 'android' 
-                ? 'Android system-wide DNS filtering and ad blocking' 
-                : 'System-wide DNS filtering and ad blocking'
-              }
+              subtitle="System-wide DNS filtering, ad blocking, and IP masking"
               onPress={() => showAlert('DNS Protection', 'Enhanced DNS protection is enabled')}
             />
             <SettingItem
