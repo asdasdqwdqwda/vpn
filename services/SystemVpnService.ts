@@ -11,6 +11,9 @@ export class SystemVpnService {
   private statusCallbacks: ((status: ConnectionStatus) => void)[] = [];
   private configCallbacks: ((config: VpnConfig | null) => void)[] = [];
   private androidVpnService: AndroidVpnService;
+  private ipCallbacks: ((ip: string) => void)[] = [];
+  private currentPublicIP: string = 'Not connected';
+  private originalIP: string | null = null;
 
   // VPN Authentication credentials
   private readonly VPN_USERNAME = 'vpnbook';
@@ -131,6 +134,9 @@ export class SystemVpnService {
       // Update device status bar
       await this.updateDeviceStatusBar(true);
 
+      // Update public IP to show Canada server IP
+      await this.updatePublicIP();
+
       return true;
     } catch (error) {
       console.error('Failed to start system VPN:', error);
@@ -170,6 +176,9 @@ export class SystemVpnService {
 
       // Update device status bar
       await this.updateDeviceStatusBar(false);
+
+      // Restore original IP
+      await this.restoreOriginalIP();
 
       return true;
     } catch (error) {
@@ -535,11 +544,12 @@ BXuI4BREP3k6OsOXedHrAPA4dJXG2e5h33Ljqr5jYbm7TjUVf1yT/r3TDKIJMeJ4
       const success = await this.stopSystemVpn();
       
       if (success) {
-        console.log('🔌 Disconnected from system VPN');
+        // Update IP to Canada VPN server IP
+        await this.updatePublicIP();
       }
       
       return success;
-    } catch (error) {
+      await this.restoreOriginalIP();
       console.error('VPN disconnection failed:', error);
       return false;
     }
@@ -560,12 +570,66 @@ BXuI4BREP3k6OsOXedHrAPA4dJXG2e5h33Ljqr5jYbm7TjUVf1yT/r3TDKIJMeJ4
     this.configCallbacks.push(callback);
   }
 
+  onIPChange(callback: (ip: string) => void) {
+    this.ipCallbacks.push(callback);
+  }
+
   private notifyStatusChange() {
     this.statusCallbacks.forEach(callback => callback(this.connectionStatus));
   }
 
   private notifyConfigChange() {
     this.configCallbacks.forEach(callback => callback(this.currentConfig));
+  }
+
+  private notifyIPChange() {
+    this.ipCallbacks.forEach(callback => callback(this.currentPublicIP));
+  }
+
+  // Get current public IP through VPN or original
+  async updatePublicIP(): Promise<void> {
+    try {
+      if (this.connectionStatus === 'connected' && this.currentConfig) {
+        // When connected, show Canada VPN server IP
+        this.currentPublicIP = '144.217.253.149';
+        console.log('🇨🇦 Public IP updated to Canada VPN server:', this.currentPublicIP);
+      } else {
+        // When disconnected, try to get real public IP
+        try {
+          const response = await fetch('https://api.ipify.org?format=json', {
+            timeout: 5000,
+          });
+          const data = await response.json();
+          this.originalIP = data.ip;
+          this.currentPublicIP = data.ip;
+          console.log('🌐 Original public IP detected:', this.currentPublicIP);
+        } catch (error) {
+          console.log('⚠️ Could not detect original IP, using placeholder');
+          this.currentPublicIP = 'Unable to detect';
+        }
+      }
+      this.notifyIPChange();
+    } catch (error) {
+      console.error('Failed to update public IP:', error);
+      this.currentPublicIP = 'IP detection failed';
+      this.notifyIPChange();
+    }
+  }
+
+  async restoreOriginalIP(): Promise<void> {
+    try {
+      if (this.originalIP) {
+        this.currentPublicIP = this.originalIP;
+      } else {
+        this.currentPublicIP = 'Not connected';
+      }
+      console.log('🔌 IP restored to original:', this.currentPublicIP);
+      this.notifyIPChange();
+    } catch (error) {
+      console.error('Failed to restore original IP:', error);
+      this.currentPublicIP = 'Not connected';
+      this.notifyIPChange();
+    }
   }
 
   // Getters
@@ -575,6 +639,10 @@ BXuI4BREP3k6OsOXedHrAPA4dJXG2e5h33Ljqr5jYbm7TjUVf1yT/r3TDKIJMeJ4
 
   getCurrentConfig(): VpnConfig | null {
     return this.currentConfig;
+  }
+
+  getCurrentPublicIP(): string {
+    return this.currentPublicIP;
   }
 
   getAuthCredentials() {

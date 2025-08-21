@@ -28,6 +28,10 @@ export default function ConnectScreen() {
     // Subscribe to status changes
     systemVpnService.onStatusChange(setConnectionStatus);
     systemVpnService.onConfigChange(setCurrentConfig);
+    systemVpnService.onIPChange(setIpAddress);
+
+    // Get initial IP
+    systemVpnService.updatePublicIP();
 
     return () => {
       // Cleanup subscriptions would go here in a real implementation
@@ -59,12 +63,10 @@ export default function ConnectScreen() {
     if (connectionStatus === 'disconnected') {
       setFallbackAttempt(0);
       const success = await systemVpnService.connectWithAutoFallback();
-      if (success) {
-        setIpAddress('144.217.253.149');
-      }
+      // IP will be updated automatically via callback
     } else if (connectionStatus === 'connected') {
       await systemVpnService.disconnect();
-      setIpAddress('Not connected');
+      // IP will be updated automatically via callback
     }
   };
 
