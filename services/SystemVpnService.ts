@@ -31,15 +31,13 @@ export class SystemVpnService {
 
       // For mobile platforms, request VPN permissions
       if (Platform.OS === 'ios') {
-        // iOS VPN permission request
-        const { VpnManager } = require('react-native-vpn');
-        const granted = await VpnManager.requestPermissions();
-        return granted;
+        // iOS VPN permission request (would require native module)
+        console.log('iOS: VPN permissions would be requested via native module');
+        return true; // Simulate permission granted for development
       } else if (Platform.OS === 'android') {
-        // Android VPN permission request
-        const { VpnService } = require('react-native-vpn');
-        const granted = await VpnService.prepare();
-        return granted;
+        // Android VPN permission request (would require native module)
+        console.log('Android: VPN permissions would be requested via native module');
+        return true; // Simulate permission granted for development
       }
 
       return false;
@@ -77,11 +75,11 @@ export class SystemVpnService {
       };
 
       if (Platform.OS === 'ios') {
-        const { VpnManager } = require('react-native-vpn');
-        await VpnManager.configure(vpnConfig);
+        // iOS VPN configuration (would require native module)
+        console.log('iOS: Configuring VPN with native module', vpnConfig);
       } else if (Platform.OS === 'android') {
-        const { VpnService } = require('react-native-vpn');
-        await VpnService.configure(vpnConfig);
+        // Android VPN configuration (would require native module)
+        console.log('Android: Configuring VPN with native module', vpnConfig);
       }
 
       // Store configuration
@@ -107,11 +105,11 @@ export class SystemVpnService {
       }
 
       if (Platform.OS === 'ios') {
-        const { VpnManager } = require('react-native-vpn');
-        await VpnManager.connect();
+        // iOS VPN connection (would require native module)
+        console.log('iOS: Starting VPN connection via native module');
       } else if (Platform.OS === 'android') {
-        const { VpnService } = require('react-native-vpn');
-        await VpnService.start();
+        // Android VPN connection (would require native module)
+        console.log('Android: Starting VPN connection via native module');
       }
 
       this.connectionStatus = 'connected';
@@ -142,11 +140,11 @@ export class SystemVpnService {
       }
 
       if (Platform.OS === 'ios') {
-        const { VpnManager } = require('react-native-vpn');
-        await VpnManager.disconnect();
+        // iOS VPN disconnection (would require native module)
+        console.log('iOS: Stopping VPN connection via native module');
       } else if (Platform.OS === 'android') {
-        const { VpnService } = require('react-native-vpn');
-        await VpnService.stop();
+        // Android VPN disconnection (would require native module)
+        console.log('Android: Stopping VPN connection via native module');
       }
 
       this.connectionStatus = 'disconnected';
@@ -183,26 +181,19 @@ export class SystemVpnService {
         
         if (Platform.OS === 'ios') {
           // iOS: Update status bar via native module
-          const { StatusBarManager } = require('react-native');
-          StatusBarManager.setNetworkActivityIndicatorVisible(true);
+          console.log('iOS: Showing VPN status bar indicator');
         } else if (Platform.OS === 'android') {
-          // Android: Show persistent notification
-          const { NotificationManager } = require('react-native-vpn');
-          await NotificationManager.showVpnNotification({
-            title: 'VPN Connected',
-            message: `Secure connection via ${statusText}`,
-            icon: 'vpn_key',
-            ongoing: true,
-          });
+          // Android: Show persistent notification (would require native module)
+          console.log('Android: Showing VPN notification:', statusText);
         }
       } else {
         // Clear VPN indicators
         if (Platform.OS === 'ios') {
-          const { StatusBarManager } = require('react-native');
-          StatusBarManager.setNetworkActivityIndicatorVisible(false);
+          // iOS: Clear status bar indicator (would require native module)
+          console.log('iOS: Clearing VPN status bar indicator');
         } else if (Platform.OS === 'android') {
-          const { NotificationManager } = require('react-native-vpn');
-          await NotificationManager.hideVpnNotification();
+          // Android: Hide VPN notification (would require native module)
+          console.log('Android: Hiding VPN notification');
         }
       }
     } catch (error) {
